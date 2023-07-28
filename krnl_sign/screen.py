@@ -52,6 +52,12 @@ def draw_live(canvas):
     graphics.DrawText(canvas, FONT_5x7, 22, 17, COLOR_WHITE, "LIVE")
     graphics.DrawText(canvas, FONT_5x7, 32 - 25, 27, COLOR_WHITE, "Mark Smith")
 
+def draw_announcement(canvas, msg):
+    draw_rect(canvas, 23, 10, 16, 8, COLOR_BLUE)
+    graphics.DrawText(canvas, FONT_5x7, 24, 17, COLOR_WHITE, "PSA")
+    graphics.DrawText(canvas, FONT_5x7, 32 - ((len(msg) * 5) // 2), 27, COLOR_WHITE, msg)
+
+
 def draw_rect(canvas, x, y, w, h, color):
     # use Canvas.SetPixel() to fill
     for i in range(w):
@@ -65,5 +71,7 @@ def update_screen():
     now = arrow.now()
     if now.minute % 2 == 0: # temporary!~
         draw_live(canvas)
+    else:
+        draw_announcement(canvas, "trans rights")
     _matrix.SwapOnVSync(canvas)
 
