@@ -10,3 +10,4 @@ def init_matrix():
     options.disable_hardware_pulsing = True
     _matrix = RGBMatrix(options = options)
     _matrix.SetPixel(0, 0, 255, 255, 255)
+    _matrix.SetPixel(1, 0, 255, 255, 255)
