@@ -6,7 +6,7 @@ if __name__ == "__main__":
     init_matrix()
     while True:
         update_screen()
-        sleep(1)
+        sleep(.1)
 
 
     sleep(5)

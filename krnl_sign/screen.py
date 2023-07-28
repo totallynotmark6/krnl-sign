@@ -46,9 +46,24 @@ def draw_header(canvas):
     graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_PURPLE, current_time)
     graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
 
+def draw_live(canvas):
+    # draw in center of screen
+    draw_rect(canvas, 21, 10, 21, 8, COLOR_RED)
+    graphics.DrawText(canvas, FONT_5x7, 22, 17, COLOR_WHITE, "LIVE")
+    graphics.DrawText(canvas, FONT_5x7, 32 - 25, 27, COLOR_WHITE, "Mark Smith")
+
+def draw_rect(canvas, x, y, w, h, color):
+    # use Canvas.SetPixel() to fill
+    for i in range(w):
+        for j in range(h):
+            canvas.SetPixel(x + i, y + j, color.red, color.green, color.blue)
+
 def update_screen():
     global _matrix
     canvas = _matrix.CreateFrameCanvas()
     draw_header(canvas)
+    now = arrow.now()
+    if now.minute % 2 == 0: # temporary!~
+        draw_live(canvas)
     _matrix.SwapOnVSync(canvas)
 
