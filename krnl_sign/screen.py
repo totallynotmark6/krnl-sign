@@ -7,8 +7,21 @@ except ImportError:
     from RGBMatrixEmulator import graphics, RGBMatrix, RGBMatrixOptions
 
 _matrix = None
+
 COLOR_WHITE = graphics.Color(255, 255, 255)
-COLOR_GRAY = graphics.Color(128, 128, 128)
+COLOR_RED = graphics.Color(255, 69, 58)
+COLOR_ORANGE = graphics.Color(255, 159, 10)
+COLOR_YELLOW = graphics.Color(255, 214, 10)
+COLOR_GREEN = graphics.Color(50, 215, 75)
+COLOR_MINT = graphics.Color(102, 212, 207)
+COLOR_TEAL = graphics.Color(106, 196, 220)
+COLOR_CYAN = graphics.Color(90, 200, 245)
+COLOR_BLUE = graphics.Color(10, 132, 255)
+COLOR_INDIGO = graphics.Color(94, 92, 230)
+COLOR_PURPLE = graphics.Color(191, 90, 242)
+COLOR_PINK = graphics.Color(255, 55, 95)
+COLOR_BROWN = graphics.Color(172, 142, 104)
+COLOR_GRAY = graphics.Color(152, 152, 157)
 
 FONT_4x6 = graphics.Font()
 FONT_4x6.LoadFont(resource_filename(__name__, "fonts/4x6.bdf"))
@@ -30,8 +43,8 @@ def draw_header(canvas):
     current_date = now.format("ddd,MMM D")
     graphics.DrawLine(canvas, 0, 7, 63, 7, COLOR_GRAY)
     graphics.DrawLine(canvas, 21, 0, 21, 7, COLOR_GRAY)
-    graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_WHITE, current_time)
-    graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_WHITE, current_date)
+    graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_MINT, current_time)
+    graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_MINT, current_date)
 
 def update_screen():
     global _matrix
