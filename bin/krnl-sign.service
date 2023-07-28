@@ -1,0 +1,13 @@
+[Unit]
+Description=KRNL Sign
+
+[Service]
+SyslogIdentifier=krnl-sign
+User=krnl
+Type=simple
+ExecStart=/home/krnl/krnl-sign/bin/start_sign.sh
+ExecStopPost=/home/krnl/krnl-sign/bin/stop_sign.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
