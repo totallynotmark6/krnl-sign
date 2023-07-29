@@ -1,5 +1,6 @@
 from time import sleep
 import arrow
+from datetime import timedelta
 from pkg_resources import resource_filename
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
@@ -72,6 +73,11 @@ def update_screen():
     global _matrix, _last_update
     delta_t = arrow.now() - _last_update
     _last_update = arrow.now()
+    if delta_t > timedelta(minutes=1):
+        print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds))
+        exit(5)
+    if delta_t > timedelta(seconds=1):
+        print(delta_t)
     canvas = _matrix.CreateFrameCanvas()
     draw_header(canvas)
     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
