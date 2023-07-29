@@ -36,6 +36,7 @@ def init_matrix():
     options.rows = 32
     options.cols = 64
     options.disable_hardware_pulsing = True
+    # options.gpio_slowdown = ???
     _matrix = RGBMatrix(options = options)
     # _matrix.SetPixel(0, 0, 255, 255, 255)
 
@@ -73,7 +74,7 @@ def update_screen():
     global _matrix, _last_update
     delta_t = arrow.now() - _last_update
     _last_update = arrow.now()
-    if delta_t > timedelta(minutes=1):
+    if delta_t > timedelta(seconds=10):
         print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds))
         exit(5)
     if delta_t > timedelta(seconds=1):
