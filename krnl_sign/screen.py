@@ -7,6 +7,7 @@ except ImportError:
     from RGBMatrixEmulator import graphics, RGBMatrix, RGBMatrixOptions
 
 _matrix = None
+_last_update = arrow.now()
 
 COLOR_WHITE = graphics.Color(255, 255, 255)
 COLOR_RED = graphics.Color(255, 69, 58)
@@ -46,16 +47,19 @@ def draw_header(canvas):
     graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_PURPLE, current_time)
     graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
 
-def draw_live(canvas):
-    # draw in center of screen
-    draw_rect(canvas, 21, 10, 21, 8, COLOR_RED)
-    graphics.DrawText(canvas, FONT_5x7, 22, 17, COLOR_WHITE, "LIVE")
-    graphics.DrawText(canvas, FONT_5x7, 32 - 25, 27, COLOR_WHITE, "Mark Smith")
-
-def draw_announcement(canvas, msg):
-    draw_rect(canvas, 23, 10, 16, 8, COLOR_BLUE)
-    graphics.DrawText(canvas, FONT_5x7, 24, 17, COLOR_WHITE, "PSA")
-    graphics.DrawText(canvas, FONT_5x7, 32 - ((len(msg) * 5) // 2), 27, COLOR_WHITE, msg)
+def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, headline_fg_color=COLOR_WHITE, MSG_FONT=FONT_5x7):
+    HEADLINE_FONT = FONT_5x7
+    headline_width = sum([HEADLINE_FONT.CharacterWidth(ord(c)) for c in headline])
+    msg_width = sum([MSG_FONT.CharacterWidth(ord(c)) for c in msg])
+    if headline_width > 64 or msg_width > 64:
+        print("ERROR: text too long")
+        return draw_headline_and_msg(canvas, "Sign Error", "Text too long", None, COLOR_WHITE, COLOR_RED, FONT_4x6)
+    headline_x = 32 - (headline_width // 2)
+    msg_x = 32 - (msg_width // 2)
+    if headline_bg_color:
+        draw_rect(canvas, headline_x - 1, 10, headline_width + 1, 8, headline_bg_color)
+    graphics.DrawText(canvas, HEADLINE_FONT, headline_x, 17, headline_fg_color, headline)
+    graphics.DrawText(canvas, MSG_FONT, msg_x, 27, msg_color, msg)
 
 
 def draw_rect(canvas, x, y, w, h, color):
@@ -65,13 +69,11 @@ def draw_rect(canvas, x, y, w, h, color):
             canvas.SetPixel(x + i, y + j, color.red, color.green, color.blue)
 
 def update_screen():
-    global _matrix
+    global _matrix, _last_update
+    delta_t = arrow.now() - _last_update
+    _last_update = arrow.now()
     canvas = _matrix.CreateFrameCanvas()
     draw_header(canvas)
-    now = arrow.now()
-    if now.minute % 2 == 0: # temporary!~
-        draw_live(canvas)
-    else:
-        draw_announcement(canvas, "trans rights")
+    draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
     _matrix.SwapOnVSync(canvas)
 
