@@ -6,6 +6,7 @@ try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 except ImportError:
     from RGBMatrixEmulator import graphics, RGBMatrix, RGBMatrixOptions
+import atexit
 
 _matrix = None
 _last_update = arrow.now()
@@ -39,6 +40,7 @@ def init_matrix():
     # options.gpio_slowdown = ???
     _matrix = RGBMatrix(options = options)
     # _matrix.SetPixel(0, 0, 255, 255, 255)
+    atexit.register(_matrix.Clear)
 
 def draw_header(canvas):
     now = arrow.now()
