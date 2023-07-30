@@ -80,6 +80,9 @@ def update_screen():
     _last_update = arrow.now()
     if delta_t > timedelta(seconds=10):
         print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds))
+        sleep(10) # see if we can't let the cpu cool down a bit
+    if delta_t > timedelta(seconds=30):
+        print("ERROR: update_screen() called after {} seconds".format(delta_t.seconds))
         exit(5)
     if delta_t > timedelta(seconds=1):
         print(delta_t)
