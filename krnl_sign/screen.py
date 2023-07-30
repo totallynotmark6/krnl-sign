@@ -2,6 +2,8 @@ from time import sleep
 import arrow
 from datetime import timedelta
 from pkg_resources import resource_filename
+
+from krnl_sign.radioco_data import get_live_data, is_live
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 except ImportError:
@@ -83,6 +85,9 @@ def update_screen():
         print(delta_t)
     canvas = _matrix.CreateFrameCanvas()
     draw_header(canvas)
-    draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
+    if is_live():
+        draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
+    else:
+        draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
     _matrix.SwapOnVSync(canvas)
 
