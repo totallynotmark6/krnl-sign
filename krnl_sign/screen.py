@@ -1,3 +1,4 @@
+import sys
 from time import sleep
 import arrow
 from datetime import timedelta
@@ -32,6 +33,10 @@ FONT_4x6 = graphics.Font()
 FONT_4x6.LoadFont(resource_filename(__name__, "fonts/4x6.bdf"))
 FONT_5x7 = graphics.Font()
 FONT_5x7.LoadFont(resource_filename(__name__, "fonts/5x7.bdf"))
+
+class Screen:
+    def draw(self):
+        pass
 
 def init_matrix():
     global _matrix
@@ -70,27 +75,27 @@ def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, h
 
 def draw_rect(canvas, x, y, w, h, color):
     # use Canvas.SetPixel() to fill
-    for i in range(w):
-        for j in range(h):
-            canvas.SetPixel(x + i, y + j, color.red, color.green, color.blue)
+    for i in range(h):
+        graphics.DrawLine(canvas, x, y + i, x + w - 1, y + i, color)
 
 def update_screen():
     global _matrix, _last_update
     delta_t = arrow.now() - _last_update
     _last_update = arrow.now()
     if delta_t > timedelta(seconds=10):
-        print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds))
+        print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
         sleep(10) # see if we can't let the cpu cool down a bit
     if delta_t > timedelta(seconds=30):
-        print("ERROR: update_screen() called after {} seconds".format(delta_t.seconds))
+        print("ERROR: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
         exit(5)
     if delta_t > timedelta(seconds=1):
         print(delta_t)
     canvas = _matrix.CreateFrameCanvas()
     draw_header(canvas)
-    if is_live():
-        draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
-    else:
-        draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
+    # if is_live():
+    #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
+    # else:
+    #     draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
+    draw_headline_and_msg(canvas, "Delta", str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6)
     _matrix.SwapOnVSync(canvas)
 
