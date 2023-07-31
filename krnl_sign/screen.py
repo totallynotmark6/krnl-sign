@@ -47,6 +47,7 @@ def init_matrix():
     options.disable_hardware_pulsing = True
     # options.gpio_slowdown = ???
     _matrix = RGBMatrix(options = options)
+    _matrix.CreateFrameCanvas()
     # _matrix.SetPixel(0, 0, 255, 255, 255)
     atexit.register(_matrix.Clear)
 
@@ -91,7 +92,8 @@ def update_screen():
         exit(5)
     if delta_t > timedelta(seconds=1):
         print(delta_t)
-    canvas = _matrix.CreateFrameCanvas()
+    canvas = _matrix.canvas
+    canvas.Clear()
     draw_header(canvas)
     # if is_live():
     #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
