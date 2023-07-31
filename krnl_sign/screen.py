@@ -13,6 +13,7 @@ import atexit
 
 _matrix = None
 _last_update = arrow.now()
+_start_time = arrow.now()
 
 COLOR_WHITE = graphics.Color(255, 255, 255)
 COLOR_RED = graphics.Color(255, 69, 58)
@@ -58,8 +59,7 @@ def draw_header(canvas):
     graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_PURPLE, current_time)
     graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
 
-def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, headline_fg_color=COLOR_WHITE, MSG_FONT=FONT_5x7):
-    HEADLINE_FONT = FONT_5x7
+def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, headline_fg_color=COLOR_WHITE, MSG_FONT=FONT_5x7, HEADLINE_FONT=FONT_5x7):
     headline_width = sum([HEADLINE_FONT.CharacterWidth(ord(c)) for c in headline])
     msg_width = sum([MSG_FONT.CharacterWidth(ord(c)) for c in msg])
     if headline_width > 64 or msg_width > 64:
@@ -68,7 +68,7 @@ def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, h
     headline_x = 32 - (headline_width // 2)
     msg_x = 32 - (msg_width // 2)
     if headline_bg_color:
-        draw_rect(canvas, headline_x - 1, 10, headline_width + 1, 8, headline_bg_color)
+        draw_rect(canvas, headline_x - 1, 10, headline_width + 1, HEADLINE_FONT.height + 1, headline_bg_color)
     graphics.DrawText(canvas, HEADLINE_FONT, headline_x, 17, headline_fg_color, headline)
     graphics.DrawText(canvas, MSG_FONT, msg_x, 27, msg_color, msg)
 
@@ -79,9 +79,10 @@ def draw_rect(canvas, x, y, w, h, color):
         graphics.DrawLine(canvas, x, y + i, x + w - 1, y + i, color)
 
 def update_screen():
-    global _matrix, _last_update
+    global _matrix, _last_update, _start_time
     delta_t = arrow.now() - _last_update
     _last_update = arrow.now()
+    _time_elapsed_since_start = arrow.now() - _start_time
     if delta_t > timedelta(seconds=10):
         print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
         sleep(10) # see if we can't let the cpu cool down a bit
@@ -96,6 +97,6 @@ def update_screen():
     #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
     # else:
     #     draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
-    draw_headline_and_msg(canvas, "Delta", str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6)
+    draw_headline_and_msg(canvas, str(_time_elapsed_since_start), str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6, FONT_4x6)
     _matrix.SwapOnVSync(canvas)
 
