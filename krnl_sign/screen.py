@@ -12,6 +12,7 @@ except ImportError:
 import atexit
 
 _matrix = None
+_canvas = None
 _last_update = arrow.now()
 _start_time = arrow.now()
 
@@ -40,14 +41,14 @@ class Screen:
         pass
 
 def init_matrix():
-    global _matrix
+    global _matrix, _canvas
     options = RGBMatrixOptions()
     options.rows = 32
     options.cols = 64
     options.disable_hardware_pulsing = True
     # options.gpio_slowdown = ???
     _matrix = RGBMatrix(options = options)
-    _matrix.CreateFrameCanvas()
+    _canvas = _matrix.CreateFrameCanvas()
     # _matrix.SetPixel(0, 0, 255, 255, 255)
     atexit.register(_matrix.Clear)
 
@@ -80,7 +81,7 @@ def draw_rect(canvas, x, y, w, h, color):
         graphics.DrawLine(canvas, x, y + i, x + w - 1, y + i, color)
 
 def update_screen():
-    global _matrix, _last_update, _start_time
+    global _matrix, _canvas, _last_update, _start_time
     delta_t = arrow.now() - _last_update
     _last_update = arrow.now()
     _time_elapsed_since_start = arrow.now() - _start_time
@@ -92,7 +93,7 @@ def update_screen():
         exit(5)
     if delta_t > timedelta(seconds=1):
         print(delta_t)
-    canvas = _matrix.canvas
+    canvas = _canvas
     canvas.Clear()
     draw_header(canvas)
     # if is_live():
@@ -100,5 +101,5 @@ def update_screen():
     # else:
     #     draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
     draw_headline_and_msg(canvas, str(_time_elapsed_since_start), str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6, FONT_4x6)
-    _matrix.SwapOnVSync(canvas)
+    _canvas = _matrix.SwapOnVSync(canvas)
 
