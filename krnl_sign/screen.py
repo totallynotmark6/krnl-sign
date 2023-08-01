@@ -9,10 +9,10 @@ try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 except ImportError:
     from RGBMatrixEmulator import graphics, RGBMatrix, RGBMatrixOptions
-import atexit
 
 _matrix = None
 _canvas = None
+_frame_count = 0
 _last_update = arrow.now()
 _start_time = arrow.now()
 
@@ -36,9 +36,6 @@ FONT_4x6.LoadFont(resource_filename(__name__, "fonts/4x6.bdf"))
 FONT_5x7 = graphics.Font()
 FONT_5x7.LoadFont(resource_filename(__name__, "fonts/5x7.bdf"))
 
-class Screen:
-    def draw(self):
-        pass
 
 def init_matrix():
     global _matrix, _canvas
@@ -50,7 +47,11 @@ def init_matrix():
     _matrix = RGBMatrix(options = options)
     _canvas = _matrix.CreateFrameCanvas()
     # _matrix.SetPixel(0, 0, 255, 255, 255)
-    atexit.register(_matrix.Clear)
+
+def clear_matrix():
+    global _matrix
+    if _matrix is not None:
+        _matrix.Clear()
 
 def draw_header(canvas):
     now = arrow.now()
@@ -74,32 +75,77 @@ def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, h
     graphics.DrawText(canvas, HEADLINE_FONT, headline_x, 17, headline_fg_color, headline)
     graphics.DrawText(canvas, MSG_FONT, msg_x, 27, msg_color, msg)
 
+def draw_progress(canvas, progress, color=COLOR_RED):
+    draw_rect(canvas, 1, 13, 62, 6, COLOR_WHITE, False)
+    progress = max(0, min(1, progress))
+    if progress > 0:
+        draw_rect(canvas, 2, 14, int(60 * progress), 4, color, True)
 
-def draw_rect(canvas, x, y, w, h, color):
+def draw_spinner(canvas, spinner, frame_counter=0, color=COLOR_RED):
+    font = FONT_5x7
+    spinner_frame = spinner["frames"][frame_counter % len(spinner["frames"])]
+    spinner_delay = spinner["interval"] / 1000
+    # print(spinner_frame, ord(spinner_frame))
+    spinner_width = sum([font.CharacterWidth(ord(c)) for c in spinner_frame])
+    spinner_x = 32 - (spinner_width // 2)
+    graphics.DrawText(canvas, font, spinner_x, 16, color, spinner_frame)
+    sleep(spinner_delay)
+
+def draw_rect(canvas, x, y, w, h, color, fill=True):
     # use Canvas.SetPixel() to fill
-    for i in range(h):
-        graphics.DrawLine(canvas, x, y + i, x + w - 1, y + i, color)
+    if fill:
+        for i in range(h):
+            graphics.DrawLine(canvas, x, y + i, x + w - 1, y + i, color)
+    else:
+        graphics.DrawLine(canvas, x, y, x + w - 1, y, color)
+        graphics.DrawLine(canvas, x, y, x, y + h - 1, color)
+        graphics.DrawLine(canvas, x + w - 1, y, x + w - 1, y + h - 1, color)
+        graphics.DrawLine(canvas, x, y + h - 1, x + w - 1, y + h - 1, color)
+
+def screen_active():
+    now = arrow.now()
+    # if is_summer():
+    if True:
+        # summer time! between 6 am and 8 pm.
+        return now.hour >= 6 and now.hour < 20
+    else:
+        # normal hours! between 6 am and midnight.
+        return now.hour >= 6 and now.hour < 24
 
 def update_screen():
-    global _matrix, _canvas, _last_update, _start_time
-    delta_t = arrow.now() - _last_update
-    _last_update = arrow.now()
-    _time_elapsed_since_start = arrow.now() - _start_time
-    if delta_t > timedelta(seconds=10):
+    global _matrix, _canvas, _frame_count, _last_update, _start_time
+    
+    now = arrow.now()
+    delta_t = now - _last_update
+    _last_update = now
+    _time_elapsed_since_start = now - _start_time
+    
+    # watchdog
+    if delta_t > timedelta(seconds=1):
         print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
-        sleep(10) # see if we can't let the cpu cool down a bit
     if delta_t > timedelta(seconds=30):
         print("ERROR: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
         exit(5)
-    if delta_t > timedelta(seconds=1):
-        print(delta_t)
+    
+    # clear canvas
     canvas = _canvas
     canvas.Clear()
-    draw_header(canvas)
+
+    # brightness
+    if screen_active():
+        _matrix.brightness = 100
+    else:
+        _matrix.brightness = 0
+        return # don't draw anything!
+
+    # draw_header(canvas)
     # if is_live():
     #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
     # else:
     #     draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
     draw_headline_and_msg(canvas, str(_time_elapsed_since_start), str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6, FONT_4x6)
+    
+    # update the screen~
     _canvas = _matrix.SwapOnVSync(canvas)
+    _frame_count += 1
 
