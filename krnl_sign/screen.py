@@ -138,7 +138,7 @@ def update_screen():
         _matrix.brightness = 0
         return # don't draw anything!
 
-    # draw_header(canvas)
+    draw_header(canvas)
     # if is_live():
     #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
     # else:
