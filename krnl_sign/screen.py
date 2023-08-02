@@ -55,7 +55,7 @@ def clear_matrix():
 
 def draw_header(canvas):
     now = arrow.now()
-    current_time = now.format("hh:mm")
+    current_time = now.format("h:mm").rjust(5)
     current_date = now.format("ddd,MMM D")
     graphics.DrawLine(canvas, 0, 7, 63, 7, COLOR_GRAY)
     graphics.DrawLine(canvas, 21, 0, 21, 7, COLOR_GRAY)
@@ -136,6 +136,7 @@ def update_screen():
         _matrix.brightness = 100
     else:
         _matrix.brightness = 0
+        _canvas = _matrix.SwapOnVSync(canvas)
         return # don't draw anything!
 
     draw_header(canvas)
