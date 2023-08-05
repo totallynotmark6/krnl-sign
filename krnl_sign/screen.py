@@ -63,8 +63,8 @@ def draw_header(canvas):
     graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
 
 def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, headline_fg_color=COLOR_WHITE, MSG_FONT=FONT_5x7, HEADLINE_FONT=FONT_5x7):
-    headline_width = sum([HEADLINE_FONT.CharacterWidth(ord(c)) for c in headline])
-    msg_width = sum([MSG_FONT.CharacterWidth(ord(c)) for c in msg])
+    headline_width = sum([HEADLINE_FONT.CharacterWidth(ord(c)) or HEADLINE_FONT.CharacterWidth(ord("a")) for c in headline])
+    msg_width = sum([MSG_FONT.CharacterWidth(ord(c)) or MSG_FONT.CharacterWidth(ord("a")) for c in msg])
     if headline_width > 64 or msg_width > 64:
         print("ERROR: text too long")
         return draw_headline_and_msg(canvas, "Sign Error", "Text too long", None, COLOR_WHITE, COLOR_RED, FONT_4x6)
@@ -86,7 +86,7 @@ def draw_spinner(canvas, spinner, frame_counter=0, color=COLOR_RED):
     spinner_frame = spinner["frames"][frame_counter % len(spinner["frames"])]
     spinner_delay = spinner["interval"] / 1000
     # print(spinner_frame, ord(spinner_frame))
-    spinner_width = sum([font.CharacterWidth(ord(c)) for c in spinner_frame])
+    spinner_width = sum([font.CharacterWidth(ord(c)) or font.CharacterWidth(ord(a)) for c in spinner_frame])
     spinner_x = 32 - (spinner_width // 2)
     graphics.DrawText(canvas, font, spinner_x, 16, color, spinner_frame)
     sleep(spinner_delay)
