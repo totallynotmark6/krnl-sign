@@ -1,11 +1,13 @@
 from datetime import timedelta
+import arrow
 import requests
 import random
 import json
 import segno
 import io
 from krnl_sign.base_task import ScreenTask
-from krnl_sign.consts import COLOR_WHITE, FONT_4x6
+from krnl_sign.consts import COLOR_PURPLE, COLOR_WHITE, FONT_4x6
+from krnl_sign.util import requests_get_1hr_cache
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 except ImportError:
@@ -18,7 +20,7 @@ class RandomPSA(ScreenTask):
         super().__init__(suggested_run_time=timedelta(seconds=15))
     
     def prepare(self):
-        req = requests.get("https://raw.githubusercontent.com/KRNL-Radio/data-sink/main/sign/psa.json")
+        req = requests_get_1hr_cache("https://raw.githubusercontent.com/KRNL-Radio/data-sink/main/sign/psa.json")
         self.psa = random.choice(req.json()['contents'])
         if self.psa['type'] == 'qr':
             self.suggested_run_time = timedelta(seconds=30) # can we do this dynamically?
@@ -36,6 +38,9 @@ class RandomPSA(ScreenTask):
             self.draw_header(canvas)
             graphics.DrawText(canvas, FONT_4x6, 1, 15, COLOR_WHITE, self.psa['text'].center(16))
         else:
+            now = arrow.now()
+            current_time = now.format("h:mm").rjust(5)
+            graphics.DrawText(canvas, FONT_4x6, 1, 32, COLOR_PURPLE, current_time)
             graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_WHITE, self.psa['text'].center(16))
             current_line = 7
             for line in self.qr_code:

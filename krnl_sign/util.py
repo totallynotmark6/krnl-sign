@@ -23,3 +23,7 @@ def internet_is_available():
         return True
     except requests.exceptions.ConnectionError:
         return False
+
+@ttl_cache(60 * 60) # 1 hour
+def requests_get_1hr_cache(url, **kwargs):
+    return requests.get(url, **kwargs)
