@@ -1,3 +1,4 @@
+import requests
 from krnl_sign.radioco_data import is_live
 from krnl_sign.screen_tasks.psa import RandomPSA
 
@@ -16,6 +17,10 @@ class ScreenManager:
         return self.not_live_tasks
 
     def update_tasks(self):
+        live_req = requests.get("https://raw.githubusercontent.com/KRNL-Radio/data-sink/main/sign/live_layout.json")
+        not_live_req = requests.get("https://raw.githubusercontent.com/KRNL-Radio/data-sink/main/sign/not_live_layout.json")
+        self.live_tasks = parse_tasks(live_req.json())
+        self.not_live_tasks = parse_tasks(not_live_req.json())
         self.not_live_tasks = [
             # put tasks here!
             # ScreenTask(timedelta(seconds=10), timedelta(seconds=15)),
@@ -32,7 +37,6 @@ class ScreenManager:
 
     def draw(self, canvas, delta_time):
         if not self.current_task:
-            print(self.current_tasks, self.index)
             if self.index >= len(self.current_tasks):
                 self.index = 0
             self.current_task = self.current_tasks[self.index]
@@ -50,3 +54,15 @@ class ScreenManager:
             self.index += 1
             return True
         return False
+
+def parse_tasks(json):
+    result = []
+    for task in json['screens']:
+        if task['type'] == 'random_psa':
+            result.append(RandomPSA.construct_from_config({}))
+        # elif task['type'] == 'something_else':
+        #     result.append(SomethingElse.construct_from_config(task))
+        else:
+            print("Unknown task type: {}".format(task['type']))
+    return result
+        

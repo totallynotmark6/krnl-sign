@@ -10,7 +10,8 @@ setup(
     license='none',
     packages=['krnl_sign'],
     install_requires=['requests',
-                      'arrow',                     
+                      'arrow',
+                      'segno'
                       ],
 
     classifiers=[
