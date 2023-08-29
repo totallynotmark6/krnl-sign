@@ -3,8 +3,12 @@ from time import sleep
 import arrow
 from datetime import timedelta
 from pkg_resources import resource_filename
+import requests
+from krnl_sign.ScreenManager import ScreenManager
+from krnl_sign.consts import COLOR_BLUE, COLOR_GRAY, COLOR_PURPLE, COLOR_RED, COLOR_WHITE, FONT_4x6, FONT_5x7
 
 from krnl_sign.radioco_data import get_live_data, is_live
+from krnl_sign.screen_tasks.error import ErrorScreenTask
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 except ImportError:
@@ -12,29 +16,9 @@ except ImportError:
 
 _matrix = None
 _canvas = None
+_screen_manager = ScreenManager()
 _frame_count = 0
 _last_update = arrow.now()
-_start_time = arrow.now()
-
-COLOR_WHITE = graphics.Color(255, 255, 255)
-COLOR_RED = graphics.Color(255, 69, 58)
-COLOR_ORANGE = graphics.Color(255, 159, 10)
-COLOR_YELLOW = graphics.Color(255, 214, 10)
-COLOR_GREEN = graphics.Color(50, 215, 75)
-COLOR_MINT = graphics.Color(102, 212, 207)
-COLOR_TEAL = graphics.Color(106, 196, 220)
-COLOR_CYAN = graphics.Color(90, 200, 245)
-COLOR_BLUE = graphics.Color(10, 132, 255)
-COLOR_INDIGO = graphics.Color(94, 92, 230)
-COLOR_PURPLE = graphics.Color(191, 90, 242)
-COLOR_PINK = graphics.Color(255, 55, 95)
-COLOR_BROWN = graphics.Color(172, 142, 104)
-COLOR_GRAY = graphics.Color(152, 152, 157)
-
-FONT_4x6 = graphics.Font()
-FONT_4x6.LoadFont(resource_filename(__name__, "fonts/4x6.bdf"))
-FONT_5x7 = graphics.Font()
-FONT_5x7.LoadFont(resource_filename(__name__, "fonts/5x7.bdf"))
 
 
 def init_matrix():
@@ -46,21 +30,12 @@ def init_matrix():
     # options.gpio_slowdown = ???
     _matrix = RGBMatrix(options = options)
     _canvas = _matrix.CreateFrameCanvas()
-    # _matrix.SetPixel(0, 0, 255, 255, 255)
+    _screen_manager.update_tasks()
 
 def clear_matrix():
     global _matrix
     if _matrix is not None:
         _matrix.Clear()
-
-def draw_header(canvas):
-    now = arrow.now()
-    current_time = now.format("h:mm").rjust(5)
-    current_date = now.format("ddd,MMM D")
-    graphics.DrawLine(canvas, 0, 7, 63, 7, COLOR_GRAY)
-    graphics.DrawLine(canvas, 21, 0, 21, 7, COLOR_GRAY)
-    graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_PURPLE, current_time)
-    graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
 
 def draw_headline_and_msg(canvas, headline, msg, headline_bg_color, msg_color, headline_fg_color=COLOR_WHITE, MSG_FONT=FONT_5x7, HEADLINE_FONT=FONT_5x7):
     headline_width = sum([HEADLINE_FONT.CharacterWidth(ord(c)) or HEADLINE_FONT.CharacterWidth(ord("a")) for c in headline])
@@ -103,6 +78,7 @@ def draw_rect(canvas, x, y, w, h, color, fill=True):
         graphics.DrawLine(canvas, x, y + h - 1, x + w - 1, y + h - 1, color)
 
 def screen_active():
+    return True
     now = arrow.now()
     # if is_summer():
     if True:
@@ -113,19 +89,11 @@ def screen_active():
         return now.hour >= 6 and now.hour < 24
 
 def update_screen():
-    global _matrix, _canvas, _frame_count, _last_update, _start_time
+    global _matrix, _canvas, _last_update, _screen_manager
     
     now = arrow.now()
     delta_t = now - _last_update
     _last_update = now
-    _time_elapsed_since_start = now - _start_time
-    
-    # watchdog
-    if delta_t > timedelta(seconds=1):
-        print("WARNING: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
-    if delta_t > timedelta(seconds=30):
-        print("ERROR: update_screen() called after {} seconds".format(delta_t.seconds), file=sys.stderr)
-        exit(5)
     
     # clear canvas
     canvas = _canvas
@@ -139,14 +107,15 @@ def update_screen():
         _canvas = _matrix.SwapOnVSync(canvas)
         return # don't draw anything!
 
-    draw_header(canvas)
-    # if is_live():
-    #     draw_headline_and_msg(canvas, "LIVE", "Hello World!", COLOR_RED, COLOR_WHITE)
-    # else:
-    #     draw_headline_and_msg(canvas, "NOT LIVE", "a", COLOR_BLUE, COLOR_WHITE)
-    draw_headline_and_msg(canvas, str(_time_elapsed_since_start), str(delta_t), None, COLOR_WHITE, COLOR_BLUE, FONT_4x6, FONT_4x6)
+    # draw stuff
+    try:
+        _screen_manager.draw(canvas, delta_t)
+    except Exception as e:
+        print("ERROR: ", e)
+        print(e.__traceback__.tb_frame.f_code.co_filename, e.__traceback__.tb_lineno)
+        _screen_manager.override_current_task(ErrorScreenTask(e))
+        # draw_headline_and_msg(canvas, "Sign Error", "No internet!", COLOR_RED, COLOR_WHITE, COLOR_RED, FONT_4x6)
     
     # update the screen~
     _canvas = _matrix.SwapOnVSync(canvas)
-    _frame_count += 1
 

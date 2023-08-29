@@ -1,5 +1,7 @@
 import time
 
+import requests
+
 def ttl_cache(ttl_seconds):
     def decorator(func):
         cache = {}
@@ -14,3 +16,10 @@ def ttl_cache(ttl_seconds):
             return cached_result['result']
         return wrapper
     return decorator
+
+def internet_is_available():
+    try:
+        requests.get("https://google.com", timeout=1)
+        return True
+    except requests.exceptions.ConnectionError:
+        return False
