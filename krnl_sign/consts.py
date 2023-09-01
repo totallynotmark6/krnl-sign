@@ -5,7 +5,7 @@ except ImportError:
 from pkg_resources import resource_filename
 
 
-DEV_MODE = True
+DEV_MODE = False
 COLOR_WHITE = graphics.Color(255, 255, 255)
 COLOR_RED = graphics.Color(255, 69, 58)
 COLOR_ORANGE = graphics.Color(255, 159, 10)

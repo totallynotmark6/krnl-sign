@@ -61,7 +61,7 @@ def draw_spinner(canvas, spinner, frame_counter=0, color=COLOR_RED):
     spinner_frame = spinner["frames"][frame_counter % len(spinner["frames"])]
     spinner_delay = spinner["interval"] / 1000
     # print(spinner_frame, ord(spinner_frame))
-    spinner_width = sum([font.CharacterWidth(ord(c)) or font.CharacterWidth(ord(a)) for c in spinner_frame])
+    spinner_width = sum([font.CharacterWidth(ord(c)) or font.CharacterWidth(ord('a')) for c in spinner_frame])
     spinner_x = 32 - (spinner_width // 2)
     graphics.DrawText(canvas, font, spinner_x, 16, color, spinner_frame)
     sleep(spinner_delay)
