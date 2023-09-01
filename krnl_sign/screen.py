@@ -88,6 +88,12 @@ def screen_active():
         # normal hours! between 6 am and midnight.
         return now.hour >= 6 and now.hour < 24
 
+def blank_screen():
+    global _matrix, _canvas
+    canvas = _canvas
+    canvas.Clear()
+    _canvas = _matrix.SwapOnVSync(canvas)
+
 def update_screen():
     global _matrix, _canvas, _last_update, _screen_manager
     

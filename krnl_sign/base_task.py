@@ -42,6 +42,30 @@ class RepeatingTask:
         # override this method to run code when the task is run!
         pass
 
+class OneTimeTask:
+    def __init__(self, run_at, func=None):
+        self.run_at = run_at
+        self.func = func
+    
+    def check(self):
+        if arrow.now() >= self.run_at:
+            return True
+        return False
+    
+    def check_and_run(self):
+        if self.check():
+            self.run()
+    
+    def run(self):
+        if self.func:
+            self.func()
+        else:
+            self.on_run()
+    
+    def on_run(self):
+        # override this method to run code when the task is run!
+        pass
+
 class ScreenTask:
     def __init__(self, suggested_run_time=timedelta(), max_run_time=timedelta()):
         self.started = None
@@ -49,6 +73,14 @@ class ScreenTask:
         self.suggested_run_time = suggested_run_time
         if max_run_time < suggested_run_time:
             max_run_time = suggested_run_time
+        self.max_run_time = max_run_time
+    
+    def set_suggested_run_time(self, suggested_run_time):
+        self.suggested_run_time = suggested_run_time
+        if self.max_run_time < suggested_run_time:
+            self.max_run_time = suggested_run_time
+    
+    def set_max_run_time(self, max_run_time):
         self.max_run_time = max_run_time
 
     def draw_header(self, canvas):

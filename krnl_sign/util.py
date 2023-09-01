@@ -14,6 +14,7 @@ def ttl_cache(ttl_seconds):
                 cache[cache_key] = {'result': cached_result, 'timestamp': now}
                 return cached_result
             return cached_result['result']
+        wrapper.clear_cache = lambda: cache.clear()
         return wrapper
     return decorator
 

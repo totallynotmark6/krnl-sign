@@ -45,11 +45,11 @@ class UpdateThread(Thread):
             sleep(5)
             return
         print("Updating...")
-        proc = subprocess.run(["git", "pull"], user="krnl", group="krnl")
+        proc = subprocess.run(["sudo", "-u", "krnl", "git", "pull"])
         if proc.returncode != 0:
             print("Error updating git!")
             return
-        py_proc = subprocess.run(["python3", "-m", "pip", "install", "-e", "-U", "."], user="krnl", group="krnl")
+        py_proc = subprocess.run(["python3", "-m", "pip", "install", "-e", "."])
         if py_proc.returncode != 0:
             print("Error updating dependencies!")
             return

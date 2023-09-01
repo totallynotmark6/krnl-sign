@@ -6,7 +6,7 @@ import json
 import segno
 import io
 from krnl_sign.base_task import ScreenTask
-from krnl_sign.consts import COLOR_PURPLE, COLOR_WHITE, FONT_4x6
+from krnl_sign.consts import COLOR_PURPLE, COLOR_WHITE, DEV_MODE, FONT_4x6
 from krnl_sign.util import requests_get_1hr_cache
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
@@ -41,7 +41,8 @@ class RandomPSA(ScreenTask):
             now = arrow.now()
             current_time = now.format("h:mm").rjust(5)
             graphics.DrawText(canvas, FONT_4x6, 1, 32, COLOR_PURPLE, current_time)
-            graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_WHITE, self.psa['text'].center(16))
+            # graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_WHITE, self.psa['text'].center(16))
+            graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_WHITE, f"{DEV_MODE=}")
             current_line = 7
             for line in self.qr_code:
                 current_x = 20
