@@ -6,11 +6,11 @@ from krnl_sign.run_with_user import run_with_user
 
 def check_for_updates():
     # check if the git repo has any updates
-    proc = run_with_user(["git", "fetch", "origin", "main"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = run_with_user(["git", "fetch", "origin", "main"], "krnl")
     if proc.returncode != 0:
         print("Error fetching updates from git repo")
         return False
-    proc = run_with_user(["git", "diff", "--name-only", "HEAD", "origin/main"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = run_with_user(["git", "diff", "--quiet", "HEAD", "origin/main"], "krnl")
     if proc.returncode != 0:
         print("Error checking for updates")
         return False
