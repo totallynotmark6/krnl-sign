@@ -4,7 +4,10 @@ set -o errexit
 #set -x
 
 cd /home/krnl/krnl-sign
-sudo python3 -m krnl_sign.startup
+
+git pull
+
+sudo python3 -m pip install -e .
 
 sudo python3 -m krnl_sign
 

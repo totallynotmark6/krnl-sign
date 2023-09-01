@@ -2,15 +2,13 @@ import os
 import pwd
 import subprocess
 
-from krnl_sign.run_with_user import run_with_user
-
 def check_for_updates():
     # check if the git repo has any updates
-    proc = run_with_user(["git", "fetch", "origin", "main"], "krnl")
+    proc = subprocess.run(["git", "fetch", "origin", "main"])
     if proc.returncode != 0:
         print("Error fetching updates from git repo")
         return False
-    proc = run_with_user(["git", "diff", "--quiet", "HEAD", "origin/main"], "krnl")
+    proc = subprocess.run(["git", "diff", "--quiet", "HEAD", "origin/main"])
     if proc.returncode != 0:
         print("Error checking for updates")
         return False
