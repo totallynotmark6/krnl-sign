@@ -6,6 +6,8 @@ except ImportError:
     RUNNING_ON_EMULATOR = True
 
 from datetime import timedelta
+import os
+import pwd
 from time import sleep
 import arrow
 from krnl_sign.consts import COLOR_BLUE, COLOR_GRAY, COLOR_MINT, COLOR_PURPLE, COLOR_RED, COLOR_WHITE, FONT_4x6, FONT_5x7
@@ -38,6 +40,22 @@ def init_matrix():
     _matrix = RGBMatrix(options = options)
     _canvas = _matrix.CreateFrameCanvas()
 
+def run_with_user(cmd, user):
+    pw_record = pwd.getpwnam(user)
+    homedir = pw_record.pw_dir
+    user_uid = pw_record.pw_uid
+    user_gid = pw_record.pw_gid
+    env = os.environ.copy()
+    env.update({'HOME': homedir, 'LOGNAME': user, 'PWD': os.getcwd(), 'USER': user})
+    proc = subprocess.run(cmd, env=env, cwd=homedir, preexec_fn=demote(user_uid, user_gid))
+    return proc
+
+def demote(user_uid, user_gid):
+    def result():
+        os.setgid(user_gid)
+        os.setuid(user_uid)
+    return result
+
 class UpdateThread(Thread):
     def run(self) -> None:
         if RUNNING_ON_EMULATOR:
@@ -45,7 +63,7 @@ class UpdateThread(Thread):
             sleep(5)
             return
         print("Updating...")
-        proc = subprocess.run(["sudo", "-u", "krnl", "git", "pull"])
+        proc = run_with_user(["git", "pull"], "krnl")
         if proc.returncode != 0:
             print("Error updating git!")
             return
