@@ -63,7 +63,7 @@ def parse_tasks(json):
         elif task['type'] == 'select_psa':
             result.append(SelectPSA.construct_from_config(task))
         elif task['type'] == 'slogan':
-            result.append(Slogan.construct_from_config())
+            result.append(Slogan.construct_from_config({}))
         # elif task['type'] == 'something_else':
         #     result.append(SomethingElse.construct_from_config(task))
         else:

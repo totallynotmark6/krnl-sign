@@ -5,6 +5,8 @@ from krnl_sign.tasks import TaskManager
 def main():
     init_matrix()
     tm = TaskManager()
+
+    print('Finishing up...')
     
     while True:
         tm.check_and_run_tasks()
