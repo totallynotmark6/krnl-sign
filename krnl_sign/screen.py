@@ -1,10 +1,12 @@
 import sys
 from time import sleep
+import traceback
 import arrow
 from datetime import timedelta
 from pkg_resources import resource_filename
 import requests
 from krnl_sign.ScreenManager import ScreenManager
+from krnl_sign.block_calendar import is_summer
 from krnl_sign.consts import COLOR_BLUE, COLOR_GRAY, COLOR_PURPLE, COLOR_RED, COLOR_WHITE, FONT_4x6, FONT_5x7
 
 from krnl_sign.radioco_data import get_live_data, is_live
@@ -78,10 +80,8 @@ def draw_rect(canvas, x, y, w, h, color, fill=True):
         graphics.DrawLine(canvas, x, y + h - 1, x + w - 1, y + h - 1, color)
 
 def screen_active():
-    return True
     now = arrow.now()
-    # if is_summer():
-    if True:
+    if is_summer():
         # summer time! between 6 am and 8 pm.
         return now.hour >= 6 and now.hour < 20
     else:
@@ -118,6 +118,7 @@ def update_screen():
         _screen_manager.draw(canvas, delta_t)
     except Exception as e:
         print("ERROR: ", e)
+        print("Traceback:" + "".join(traceback.format_tb(e.__traceback__)))
         print(e.__traceback__.tb_frame.f_code.co_filename, e.__traceback__.tb_lineno)
         _screen_manager.override_current_task(ErrorScreenTask(e))
         # draw_headline_and_msg(canvas, "Sign Error", "No internet!", COLOR_RED, COLOR_WHITE, COLOR_RED, FONT_4x6)

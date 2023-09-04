@@ -53,4 +53,6 @@ def calendar_data(for_date: arrow.Arrow):
         for block_data in year_data['blocks']:
             if block_data['end'] < for_date:
                 last_block = block_data
-        
+
+def is_summer():
+    return False

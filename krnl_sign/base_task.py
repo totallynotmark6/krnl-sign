@@ -86,7 +86,8 @@ class ScreenTask:
     def draw_header(self, canvas):
         now = arrow.now()
         current_time = now.format("h:mm").rjust(5)
-        current_date = now.format("ddd,MMM D")
+        # current_date = now.format("ddd,MMM D")
+        current_date = "KRNL RADIO" # for tabling!
         graphics.DrawLine(canvas, 0, 7, 63, 7, COLOR_GRAY)
         graphics.DrawLine(canvas, 21, 0, 21, 7, COLOR_GRAY)
         graphics.DrawText(canvas, FONT_4x6, 1, 6, COLOR_PURPLE, current_time)

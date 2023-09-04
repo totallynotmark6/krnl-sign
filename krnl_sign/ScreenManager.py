@@ -1,6 +1,6 @@
 import requests
 from krnl_sign.radioco_data import is_live
-from krnl_sign.screen_tasks.psa import RandomPSA
+from krnl_sign.screen_tasks.psa import RandomPSA, SelectPSA, Slogan
 
 
 class ScreenManager:
@@ -21,11 +21,11 @@ class ScreenManager:
         not_live_req = requests.get("https://raw.githubusercontent.com/KRNL-Radio/data-sink/main/sign/not_live_layout.json")
         self.live_tasks = parse_tasks(live_req.json())
         self.not_live_tasks = parse_tasks(not_live_req.json())
-        self.not_live_tasks = [
-            # put tasks here!
-            # ScreenTask(timedelta(seconds=10), timedelta(seconds=15)),
-            RandomPSA.construct_from_config({})
-        ]
+        # self.not_live_tasks = [
+        #     # put tasks here!
+        #     # ScreenTask(timedelta(seconds=10), timedelta(seconds=15)),
+        #     Slogan(),
+        # ]
         pass
 
     def override_current_task(self, task):
@@ -60,6 +60,10 @@ def parse_tasks(json):
     for task in json['screens']:
         if task['type'] == 'random_psa':
             result.append(RandomPSA.construct_from_config({}))
+        elif task['type'] == 'select_psa':
+            result.append(SelectPSA.construct_from_config(task))
+        elif task['type'] == 'slogan':
+            result.append(Slogan.construct_from_config())
         # elif task['type'] == 'something_else':
         #     result.append(SomethingElse.construct_from_config(task))
         else:
