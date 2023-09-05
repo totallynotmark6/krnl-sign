@@ -1,6 +1,7 @@
 import requests
 from krnl_sign.radioco_data import is_live
-from krnl_sign.screen_tasks.psa import RandomPSA, SelectPSA, Slogan
+from krnl_sign.screen_tasks.now_playing import KRNLNowPlaying
+from krnl_sign.screen_tasks.psa import RandomPSA, SelectPSA, ShowsAndCounting, Slogan
 
 
 class ScreenManager:
@@ -24,7 +25,8 @@ class ScreenManager:
         # self.not_live_tasks = [
         #     # put tasks here!
         #     # ScreenTask(timedelta(seconds=10), timedelta(seconds=15)),
-        #     Slogan(),
+        #     # Slogan(),
+        #     ShowsAndCounting()
         # ]
         pass
 
@@ -64,6 +66,10 @@ def parse_tasks(json):
             result.append(SelectPSA.construct_from_config(task))
         elif task['type'] == 'slogan':
             result.append(Slogan.construct_from_config({}))
+        elif task['type'] == 'krnl_now_playing':
+            result.append(KRNLNowPlaying.construct_from_config({}))
+        elif task['type'] == 'shows_and_counting':
+            result.append(ShowsAndCounting.construct_from_config({}))
         # elif task['type'] == 'something_else':
         #     result.append(SomethingElse.construct_from_config(task))
         else:

@@ -94,6 +94,13 @@ class ScreenTask:
         graphics.DrawText(canvas, FONT_4x6, 23, 6, COLOR_PURPLE, current_date)
     
     def prepare(self):
+        """
+        This method is called when the task is first run.
+
+        If this method returns False, the task will be skipped.
+
+        If this method returns True, the task will be run.
+        """
         # do any setup here!
         self.started = arrow.now()
         self.elapsed_time = timedelta()
@@ -103,6 +110,9 @@ class ScreenTask:
         # if there's nothing needed, why do we need to run?
         return True
     
+    """
+    This method is called when the task is done running.
+    """
     def teardown(self, forced=False):
         # do any cleanup here!
         pass
@@ -128,6 +138,13 @@ class ScreenTask:
     def is_over_suggested_time(self):
         return self.elapsed_time > self.suggested_run_time
 
+    """
+    This method is called for every frame of the task.
+
+    If this method returns False, the task will continue to run.
+
+    If this method returns True, the task will be stopped soon after!
+    """
     def draw_frame(self, canvas, delta_time):
         # override this method to run code when the screen is updated!
         # return True if you're done updating!

@@ -6,7 +6,7 @@ import json
 import segno
 import io
 from krnl_sign.base_task import ScreenTask
-from krnl_sign.consts import COLOR_CYAN, COLOR_PURPLE, COLOR_WHITE, DEV_MODE, FONT_4x6, FONT_5x7
+from krnl_sign.consts import COLOR_CYAN, COLOR_PURPLE, COLOR_WHITE, DEV_MODE, FONT_4x6, FONT_5x7, FONT_9x15
 from krnl_sign.util import requests_get_1hr_cache
 try:
     from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
@@ -112,6 +112,24 @@ class Slogan(ScreenTask):
         else:
             graphics.DrawText(canvas, FONT_4x6, 1, 24, COLOR_WHITE, msg.strip().center(16))
         # graphics.DrawText(canvas, FONT_4x6, 1, 15, COLOR_WHITE, self.slogan.center(16))
+    
+    @classmethod
+    def construct_from_config(cls, config):
+        return cls()
+
+class ShowsAndCounting(ScreenTask):
+    # literally just for tabling lol
+    def __init__(self):
+        super().__init__(suggested_run_time=timedelta(seconds=15))
+    
+    def prepare(self):
+        self.shows = "10"
+        return super().prepare()
+    
+    def draw_frame(self, canvas, delta_time):
+        self.draw_header(canvas)
+        graphics.DrawText(canvas, FONT_9x15, 23, 20, COLOR_CYAN, self.shows)
+        graphics.DrawText(canvas, FONT_4x6, 1, 30, COLOR_WHITE, "Shows & Counting")
     
     @classmethod
     def construct_from_config(cls, config):
